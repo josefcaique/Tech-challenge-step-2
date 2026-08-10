@@ -1,0 +1,33 @@
+repos:
+  # Lint + format com Ruff (extremamente rápido, substitui várias ferramentas)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.5.0
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format
+
+  # Hooks genéricos de higiene do repositório
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-added-large-files
+        args: [--maxkb=5000]
+      - id: check-merge-conflict
+      - id: debug-statements
+      - id: mixed-line-ending
+
+  # Garante que dvc.yaml/dvc.lock fiquem sincronizados antes do commit
+  - repo: https://github.com/iterative/dvc
+    rev: 3.67.1
+    hooks:
+      - id: dvc-pre-commit
+        additional_dependencies: ["pathspec<1"]
+        stages: [pre-commit]
+
+default_language_version:
+  python: python3.11

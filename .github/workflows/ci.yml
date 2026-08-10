@@ -1,0 +1,143 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop, "feature/**"]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  PYTHON_VERSION: "3.11"
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  create_pr:
+    name: Create PR for feature branch
+    if: github.event_name == 'push' && startsWith(github.ref_name, 'feature/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Create pull request if missing
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const headBranch = context.ref.replace('refs/heads/', '');
+            const baseBranch = 'main';
+            const { owner, repo } = context.repo;
+
+            const existingPullRequests = await github.rest.pulls.list({
+              owner,
+              repo,
+              state: 'open',
+              head: `${owner}:${headBranch}`,
+            });
+
+            if (existingPullRequests.data.length > 0) {
+              core.info(`Pull request already exists: #${existingPullRequests.data[0].number}`);
+              return;
+            }
+
+            await github.rest.pulls.create({
+              owner,
+              repo,
+              head: headBranch,
+              base: baseBranch,
+              title: headBranch,
+              body: 'Pull request criada automaticamente pelo workflow para uma branch feature.',
+            });
+
+  lint:
+    name: Lint (ruff + pre-commit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Poetry
+        run: pipx install poetry
+
+      - name: Cache Poetry virtualenv
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: poetry-${{ runner.os }}-${{ hashFiles('poetry.lock') }}
+
+      - name: Configure Poetry to use in-project venv
+        run: poetry config virtualenvs.in-project true
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Ruff check
+        run: poetry run ruff check .
+
+      - name: Ruff format check
+        run: poetry run ruff format --check .
+
+      - name: Run pre-commit (all hooks)
+        run: poetry run pre-commit run --all-files --show-diff-on-failure
+
+  test:
+    name: Testes (pytest)
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Poetry
+        run: pipx install poetry
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Run tests with coverage
+        run: poetry run pytest
+
+  pipeline:
+    name: Pipeline DVC (repro + metrics)
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Poetry
+        run: pipx install poetry
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Pull dados versionados do remote DVC
+        run: poetry run dvc pull --force
+        continue-on-error: true
+
+      - name: Reproduzir pipeline (dvc repro)
+        run: poetry run dvc repro
+
+      - name: Exibir métricas
+        run: poetry run dvc metrics show
+
+      - name: Upload de métricas como artefato do CI
+        uses: actions/upload-artifact@v4
+        with:
+          name: pipeline-metrics
+          path: |
+            metrics/*.json
