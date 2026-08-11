@@ -87,7 +87,7 @@ jobs:
         run: poetry run pre-commit run --all-files --show-diff-on-failure
 
   test:
-    name: Testes
+    name: Tests
     runs-on: ubuntu-latest
     needs: lint
     steps:
