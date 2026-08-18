@@ -1,0 +1,16 @@
+# Core
+mlflow
+psycopg2-binary>=2.9.9,<3.0.0
+boto3>=1.34.0,<2.0.0
+
+# ML & Data Science
+pandas>=2.0.0,<2.1.0
+numpy>=1.24.0,<2.0.0
+scikit-learn>=1.3.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+torch>=2.0.0
+
+# Utilities
+python-dotenv>=1.0.0
+tqdm>=4.65.0

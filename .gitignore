@@ -83,3 +83,9 @@ mlflow.db
 # CatBoost
 src/notebooks/catboost_info/
 catboost_info/
+__pycache__/
+*.py[cod]
+*.ipynb_checkpoints/
+.venv/
+mlruns/
+models/*.joblib

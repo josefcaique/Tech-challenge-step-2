@@ -1,0 +1,72 @@
+# Imagem base Ubuntu com hash fixo para reprodutibilidade total
+FROM ubuntu@sha256:7c2884fd32770fc6c173b78e0dc2278a2851d89f5447919edbc45475ac55dd6a
+FROM python:3.11
+# Evita prompts interativos durante a instalação de pacotes
+ENV DEBIAN_FRONTEND=noninteractive
+
+# ============================================
+# 1. INSTALAÇÃO MÍNIMA E ESSENCIAL
+# ============================================
+# - Remove python3-venv (redundante, pois Poetry não cria virtualenv)
+# - Remove curl (não utilizado em nenhuma etapa)
+# - Adiciona python3-dev (indispensável para compilar C-extensions como numpy, pandas, scikit-learn)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        python3 \
+        python3-pip \
+        python3-dev \
+        build-essential \
+        && rm -rf /var/lib/apt/lists/*
+
+# Padroniza o comando 'python' apontando para o Python 3
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
+# ============================================
+# 2. SEGURANÇA: Cria usuário não-root
+# ============================================
+RUN useradd -m -u 1001 datauser
+
+# Define o diretório de trabalho
+WORKDIR /data
+
+# ============================================
+# 3. INSTALAÇÃO DO POETRY
+# ============================================
+RUN pip3 install --no-cache-dir poetry==2.4.1 && \
+    poetry config virtualenvs.create false
+
+# ============================================
+# 4. CAMADA DE CACHE (DEPENDÊNCIAS)
+# ============================================
+# ⚠️ IMPORTANTE: Este Dockerfile DEVE estar na RAIZ do projeto.
+# Se estiver na raiz, o contexto de build enxerga pyproject.toml e poetry.lock.
+COPY pyproject.toml /. 
+COPY poetry.lock /.
+
+
+# Instala as dependências de produção
+RUN poetry config virtualenvs.create false \
+    && poetry install --no-interaction --no-ansi --without dev --no-root
+
+# ============================================
+# 6. AJUSTE DE PERMISSÕES E VARIÁVEIS DE AMBIENTE
+# ============================================
+# Dá a posse dos arquivos para o usuário não-root
+RUN chown -R datauser:datauser /data
+
+# Boa prática para logs em Python
+ENV PYTHONUNBUFFERED=1
+
+# Porta da aplicação (altere conforme necessário)
+EXPOSE 8000
+
+# ============================================
+# 7. EXECUÇÃO COM USUÁRIO RESTRITO
+# ============================================
+USER datauser
+
+
+# ============================================
+# 8. COMANDO PADRÃO (MANTÉM O CONTAINER RODANDO)
+# ============================================
+CMD ["tail", "-f", "/dev/null"]

@@ -1,0 +1,46 @@
+FROM condaforge/miniforge3:26.1.0-0
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Cria o ambiente conda 'techchallenge' com Python 3.9
+RUN conda create -n techchallenge python=3.9 -y && \
+    conda clean -afy
+
+# Instala o JupyterLab e o pip dentro do ambiente 'techchallenge'
+RUN conda install -n techchallenge -c conda-forge jupyterlab pip -y && \
+    conda clean -afy
+
+# Copia o arquivo de dependências
+COPY requirements.txt /tmp/requirements.txt
+
+# Instala os pacotes Python via pip dentro do ambiente 'techchallenge'
+RUN conda run -n techchallenge pip install --no-cache-dir -r /tmp/requirements.txt
+
+# Cria o diretório de trabalho e ajusta permissões (opcional)
+RUN mkdir -p /home/jarvis && \
+    chmod 755 /home/jarvis
+
+# Cria um script de inicialização que ativa o ambiente conda e inicia o JupyterLab
+RUN echo '#!/bin/bash\n\
+set -e\n\
+\n\
+# Ativa o ambiente conda techchallenge\n\
+source /opt/conda/etc/profile.d/conda.sh\n\
+conda activate techchallenge\n\
+\n\
+# Inicia o JupyterLab\n\
+exec jupyter lab \\\n\
+    --ip=0.0.0.0 \\\n\
+    --port=8888 \\\n\
+    --no-browser \\\n\
+    --allow-root \\\n\
+    --NotebookApp.token="" \\\n\
+    --NotebookApp.password="" \\\n\
+    --notebook-dir=/home/jarvis \\\n\
+    "$@"' > /usr/local/bin/start-notebook.sh && \
+    chmod +x /usr/local/bin/start-notebook.sh
+
+WORKDIR /home/jarvis
+EXPOSE 8888
+
+CMD ["start-notebook.sh"]

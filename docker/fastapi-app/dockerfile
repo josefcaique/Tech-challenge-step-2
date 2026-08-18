@@ -1,0 +1,25 @@
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.11
+
+
+RUN pip3 install --no-cache-dir poetry==2.4.1 && \
+    poetry config virtualenvs.create false
+
+# ============================================
+# 4. CAMADA DE CACHE (DEPENDÊNCIAS)
+# ============================================
+# ⚠️ IMPORTANTE: Este Dockerfile DEVE estar na RAIZ do projeto.
+# Se estiver na raiz, o contexto de build enxerga pyproject.toml e poetry.lock.
+COPY pyproject.toml /. 
+COPY poetry.lock /.
+
+
+# Instala as dependências de produção 
+RUN poetry config virtualenvs.create false \
+    && poetry install --no-interaction --no-ansi --without dev --no-root
+
+
+
+
+# O código será montado via volume, então não copiamos nada aqui.
+# Apenas garantimos que o uvicorn esteja disponível.
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
