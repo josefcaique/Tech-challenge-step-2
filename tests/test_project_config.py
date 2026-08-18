@@ -1,8 +1,8 @@
 """Tests for project configuration files and pipeline metadata."""
 
-import tomllib
 from pathlib import Path
 
+import tomllib
 import yaml
 
 

@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+
 import joblib
 import mlflow
 import mlflow.sklearn
@@ -23,15 +24,17 @@ def main():
     os.environ.setdefault("MLFLOW_ALLOW_FILE_STORE", "true")
     os.environ.setdefault("MLFLOW_TRACKING_URI", MLFLOW_DB_URI)
     os.environ.setdefault("MLFLOW_REGISTRY_URI", MLFLOW_DB_URI)
-    df = pd.read_csv(DATASET_PATH)
-    df["Weekend"] = df["Weekend"].astype(bool)
-    df["Revenue"] = df["Revenue"].astype(bool)
+    shoppers_df = pd.read_csv(DATASET_PATH)
+    shoppers_df["Weekend"] = shoppers_df["Weekend"].astype(bool)
+    shoppers_df["Revenue"] = shoppers_df["Revenue"].astype(bool)
 
     categorical_features = ["Month", "VisitorType"]
-    numeric_features = [c for c in df.columns if c not in categorical_features + ["Revenue"]]
+    numeric_features = [
+        c for c in shoppers_df.columns if c not in categorical_features + ["Revenue"]
+    ]
 
-    X = df.drop(columns=["Revenue"])
-    y = df["Revenue"].astype(int)
+    X = shoppers_df.drop(columns=["Revenue"])
+    y = shoppers_df["Revenue"].astype(int)
 
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42, stratify=y
