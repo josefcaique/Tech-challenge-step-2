@@ -1,0 +1,28 @@
+preprocess:
+  raw_data_path: data/raw/interactions.csv
+  processed_data_path: data/processed/interactions_clean.csv
+  test_size: 0.2
+  random_state: 42
+
+feature_eng:
+  input_path: data/processed/interactions_clean.csv
+  output_path: data/processed/features.parquet
+  min_interactions_per_user: 5
+
+train:
+  features_path: data/processed/features.parquet
+  model_path: models/recommender.pt
+  metrics_path: metrics/train_metrics.json
+  embedding_dim: 32
+  hidden_dim: 64
+  learning_rate: 0.001
+  batch_size: 256
+  epochs: 20
+  patience: 3
+  random_state: 42
+
+evaluate:
+  model_path: models/recommender.pt
+  features_path: data/processed/features.parquet
+  metrics_path: metrics/evaluation.json
+  k: 10

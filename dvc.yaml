@@ -1,0 +1,46 @@
+stages:
+  preprocess:
+    cmd: python -m src.pipeline.preprocess
+    deps:
+      - src/pipeline/preprocess.py
+      - ${preprocess.raw_data_path}
+    params:
+      - preprocess
+    outs:
+      - ${preprocess.processed_data_path}
+
+  feature_eng:
+    cmd: python -m src.pipeline.feature_eng
+    deps:
+      - src/pipeline/feature_eng.py
+      - ${feature_eng.input_path}
+    params:
+      - feature_eng
+    outs:
+      - ${feature_eng.output_path}
+
+  train:
+    cmd: python -m src.pipeline.train
+    deps:
+      - src/pipeline/train.py
+      - src/pipeline/model.py
+      - ${train.features_path}
+    params:
+      - train
+    outs:
+      - ${train.model_path}
+    metrics:
+      - ${train.metrics_path}:
+          cache: false
+
+  evaluate:
+    cmd: python -m src.pipeline.evaluate
+    deps:
+      - src/pipeline/evaluate.py
+      - ${evaluate.model_path}
+      - ${evaluate.features_path}
+    params:
+      - evaluate
+    metrics:
+      - ${evaluate.metrics_path}:
+          cache: false

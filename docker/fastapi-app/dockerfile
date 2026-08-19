@@ -9,11 +9,11 @@ RUN pip3 install --no-cache-dir poetry==2.4.1 && \
 # ============================================
 # ⚠️ IMPORTANTE: Este Dockerfile DEVE estar na RAIZ do projeto.
 # Se estiver na raiz, o contexto de build enxerga pyproject.toml e poetry.lock.
-COPY pyproject.toml /. 
+COPY pyproject.toml /.
 COPY poetry.lock /.
 
 
-# Instala as dependências de produção 
+# Instala as dependências de produção
 RUN poetry config virtualenvs.create false \
     && poetry install --no-interaction --no-ansi --without dev --no-root
 
