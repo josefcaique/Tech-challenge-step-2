@@ -63,13 +63,13 @@ def load_dataset(path: Path) -> pd.DataFrame:
 def get_feature_columns(df: pd.DataFrame) -> tuple[list[str], list[str]]:
     """Separa as colunas em categóricas e numéricas para o pré-processamento."""
     categorical_features = ["Month", "VisitorType"]
-    numeric_features = [
-        c for c in df.columns if c not in categorical_features + ["Revenue"]
-    ]
+    numeric_features = [c for c in df.columns if c not in categorical_features + ["Revenue"]]
     return categorical_features, numeric_features
 
 
-def build_preprocessor(categorical_features: list[str], numeric_features: list[str]) -> ColumnTransformer:
+def build_preprocessor(
+    categorical_features: list[str], numeric_features: list[str]
+) -> ColumnTransformer:
     """Monta o ColumnTransformer que imputa e escala/codifica as features."""
     numeric_transformer = Pipeline(
         steps=[("imputer", SimpleImputer(strategy="median")), ("scaler", StandardScaler())]
@@ -171,7 +171,11 @@ def save_local_copy(model: Pipeline, path: Path) -> None:
 
 
 def train_and_evaluate(
-    model: Pipeline, X_train: pd.DataFrame, X_test: pd.DataFrame, y_train: pd.Series, y_test: pd.Series
+    model: Pipeline,
+    X_train: pd.DataFrame,
+    X_test: pd.DataFrame,
+    y_train: pd.Series,
+    y_test: pd.Series,
 ) -> tuple[dict[str, float], str]:
     """Treina o pipeline e calcula métricas + classification_report no conjunto de teste."""
     model.fit(X_train, y_train)
