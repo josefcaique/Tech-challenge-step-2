@@ -196,9 +196,9 @@ def promote_and_report(version: str, metrics: dict[str, float]) -> None:
 
 def prepare_data(path: Path) -> tuple[Pipeline, pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
     """Carrega o dataset, faz o split e monta o pipeline pronto para treino."""
-    df = load_dataset(path)
-    categorical_features, numeric_features = get_feature_columns(df)
-    X, y = df.drop(columns=["Revenue"]), df["Revenue"].astype(int)
+    shoppers_df = load_dataset(path)
+    categorical_features, numeric_features = get_feature_columns(shoppers_df)
+    X, y = shoppers_df.drop(columns=["Revenue"]), shoppers_df["Revenue"].astype(int)
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=TEST_SIZE, random_state=RANDOM_STATE, stratify=y
     )
