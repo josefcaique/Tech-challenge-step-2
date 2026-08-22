@@ -1,29 +1,30 @@
 # Python
 __pycache__/
 *.py[cod]
-.pytest_cache/
-.ruff_cache/
-.coverage
-htmlcov/
 *.egg-info/
+dist/
+build/
+.eggs/
 
 # Ambientes virtuais
 .venv/
 venv/
 env/
 ENV/
+
+# Variáveis de ambiente
 .env
 .env.local
 .env.*
+!.env.example
 
-#  Ferramentas de Desenvolvimento (Linting e Testes)
+# Ferramentas de desenvolvimento (linting e testes)
 .ruff_cache/
 .pytest_cache/
 .mypy_cache/
 .coverage
 htmlcov/
 .tox/
-
 
 # Poetry
 poetry.lock.bak
@@ -35,57 +36,39 @@ poetry.lock.bak
 !/data/processed/.gitkeep
 /models/*
 !/models/.gitkeep
+models/*.joblib
 
-# MLflow
+# MLflow — tracking store e artefatos gerados localmente
 mlruns/
 mlartifacts/
+mlruns.db
+mlflow.db
+
+# Machine Learning — modelos treinados pesados
+*.pkl
+*.h5
+*.pt
+*.pth
+*.onnx
+
+# CatBoost
+src/notebooks/catboost_info/
+catboost_info/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Datasets e arquivos pesados
+*.csv
+*.parquet
+*.sqlite3
 
 # Editor/OS
 .vscode/
 .idea/
 .DS_Store
-*.swp
-*.swo
-
-# Distribuição e Build
-*.egg-info/
-dist/
-build/
-.eggs/
-
-# Sistema Operativo
 Thumbs.db
 ehthumbs.db
 Desktop.ini
-.DS_Store
-
-# Machine Learning & Jupyter Notebooks
-.ipynb_checkpoints/
-# Ignorar bases de dados locais e ficheiros pesados
-*.csv
-*.parquet
-*.json
-*.sqlite3
-data/raw/
-data/processed/
-# Ignorar modelos treinados pesados
-*.pkl
-*.h5
-*.pt
-*.onnx
-# MLflow
-mlruns/
-mlartifacts/
-mlruns.db
-mlflow.db
-# Modelos PyTorch locais
-*.pth
-# CatBoost
-src/notebooks/catboost_info/
-catboost_info/
-__pycache__/
-*.py[cod]
-*.ipynb_checkpoints/
-.venv/
-mlruns/
-models/*.joblib
+*.swp
+*.swo
