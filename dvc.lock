@@ -78,8 +78,8 @@ stages:
     outs:
     - path: metrics/train_metrics.json
       hash: md5
-      md5: 8dd981e7bddf123821492479dd3fa273
-      size: 84
+      md5: 98b5f57b27f1288a416383fc6df0f079
+      size: 86
     - path: models/random_forest_model.joblib
       hash: md5
       md5: 5cab535ecdb2b1bb1f8f6649522c643d
@@ -111,5 +111,5 @@ stages:
     outs:
     - path: metrics/evaluation.json
       hash: md5
-      md5: 5f375b893dbfc204d1aacd1e7e8f8800
-      size: 176
+      md5: 0cb021a24504405fe6cd62135af62325
+      size: 178
