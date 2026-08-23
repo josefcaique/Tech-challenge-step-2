@@ -28,13 +28,20 @@ htmlcov/
 # Poetry
 poetry.lock.bak
 
-# DVC — dados/modelos versionados via DVC, não via Git
+# DVC — dados/modelos versionados via DVC, não via Git (os .dvc/*.dvc ficam no git)
 /data/raw/*
+!/data/raw/*.dvc
 !/data/raw/.gitkeep
 /data/processed/*
 !/data/processed/.gitkeep
 /models/*
 !/models/.gitkeep
+
+# DVC remote local (fica só na máquina do dev, não vai pro git)
+/.dvcstore/
+
+# Métricas do pipeline DVC são versionadas via git (dvc.yaml usa cache: false)
+!/metrics/*.json
 
 # MLflow
 mlruns/
@@ -57,35 +64,15 @@ build/
 Thumbs.db
 ehthumbs.db
 Desktop.ini
-.DS_Store
 
 # Machine Learning & Jupyter Notebooks
 .ipynb_checkpoints/
-# Ignorar bases de dados locais e ficheiros pesados
-*.csv
-*.parquet
-*.json
-*.sqlite3
-data/raw/
-data/processed/
-# Ignorar modelos treinados pesados
 *.pkl
 *.h5
 *.pt
 *.onnx
-# MLflow
-mlruns/
-mlartifacts/
-mlruns.db
-mlflow.db
-# Modelos PyTorch locais
 *.pth
+
 # CatBoost
 src/notebooks/catboost_info/
 catboost_info/
-__pycache__/
-*.py[cod]
-*.ipynb_checkpoints/
-.venv/
-mlruns/
-models/*.joblib

@@ -13,7 +13,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-DATASET_PATH = Path("seeds/online_shoppers_intention.csv")
+DATASET_PATH = Path("data/raw/online_shoppers_intention.csv")
 MODEL_PATH = Path("models/random_forest_model.joblib")
 MLFLOW_TRACKING_DIR = Path("mlruns")
 MODEL_NAME = "random_forest_revenue_model"
