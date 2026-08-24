@@ -39,9 +39,6 @@ poetry.lock.bak
 !/models/.gitkeep
 models/*.joblib
 
-# DVC remote local (fica só na máquina do dev, não vai pro git)
-/.dvcstore/
-
 # MLflow — tracking store e artefatos gerados localmente
 mlruns/
 mlartifacts/

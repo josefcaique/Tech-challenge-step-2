@@ -24,6 +24,7 @@ from src.pipeline._params import load_params
 
 def main() -> None:
     params = load_params("evaluate")
+    train_params = load_params("train")
 
     target = params["target"]
     features_df = pd.read_parquet(params["features_path"])
@@ -31,13 +32,11 @@ def main() -> None:
     X = features_df.drop(columns=[target])
     y = features_df[target]
 
-    # Mesmo split usado no treino (test_size/random_state), para avaliar sobre
-    # o conjunto de teste original sem precisar persistir os índices.
     _, X_test, _, y_test = train_test_split(
         X,
         y,
-        test_size=params["test_size"],
-        random_state=params["random_state"],
+        test_size=train_params["test_size"],
+        random_state=train_params["random_state"],
         stratify=y,
     )
 

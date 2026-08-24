@@ -10,11 +10,10 @@ import pandas as pd
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 
+from src.model_registry import MODEL_NAME, promote_if_better
 from src.pipeline import model as model_module
 from src.pipeline._mlflow import start_run
 from src.pipeline._params import load_params
-
-MODEL_NAME = "random_forest_revenue_model"
 
 
 def main() -> None:
@@ -76,11 +75,12 @@ def main() -> None:
         model_uri = f"runs:/{run.info.run_id}/{MODEL_NAME}"
         registered_model = mlflow.register_model(model_uri=model_uri, name=MODEL_NAME)
         client = mlflow.tracking.MlflowClient()
-        client.set_registered_model_alias(
-            name=MODEL_NAME, alias="champion", version=registered_model.version
-        )
-        client.set_registered_model_alias(
-            name=MODEL_NAME, alias="staging", version=registered_model.version
+        promote_if_better(
+            client,
+            MODEL_NAME,
+            registered_model.version,
+            {"test_accuracy": test_accuracy},
+            metric_name="test_accuracy",
         )
 
     model_path = Path(params["model_path"])

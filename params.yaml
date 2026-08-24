@@ -27,5 +27,3 @@ evaluate:
   features_path: data/processed/features.parquet
   metrics_path: metrics/evaluation.json
   target: Revenue
-  test_size: 0.2
-  random_state: 42

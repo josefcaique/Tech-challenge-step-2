@@ -62,8 +62,8 @@ stages:
       size: 2090
     - path: src/pipeline/train.py
       hash: md5
-      md5: be047185047aff19e1611605f545c4cb
-      size: 3194
+      md5: 9c0c3cefe32a8b55ab8e3a40d85009bc
+      size: 3152
     params:
       params.yaml:
         train:
@@ -78,8 +78,8 @@ stages:
     outs:
     - path: metrics/train_metrics.json
       hash: md5
-      md5: 98b5f57b27f1288a416383fc6df0f079
-      size: 86
+      md5: 8dd981e7bddf123821492479dd3fa273
+      size: 84
     - path: models/random_forest_model.joblib
       hash: md5
       md5: 5cab535ecdb2b1bb1f8f6649522c643d
@@ -97,8 +97,8 @@ stages:
       size: 4542427
     - path: src/pipeline/evaluate.py
       hash: md5
-      md5: d5abe3927a90e2cfe110c8e70336c42c
-      size: 2395
+      md5: a11e8c9f40d5726a58882c7415983d31
+      size: 2451
     params:
       params.yaml:
         evaluate:
@@ -106,10 +106,17 @@ stages:
           features_path: data/processed/features.parquet
           metrics_path: metrics/evaluation.json
           target: Revenue
+        train:
+          features_path: data/processed/features.parquet
+          model_path: models/random_forest_model.joblib
+          metrics_path: metrics/train_metrics.json
+          target: Revenue
           test_size: 0.2
           random_state: 42
+          n_estimators: 200
+          max_depth: 8
     outs:
     - path: metrics/evaluation.json
       hash: md5
-      md5: 0cb021a24504405fe6cd62135af62325
-      size: 178
+      md5: 5f375b893dbfc204d1aacd1e7e8f8800
+      size: 176

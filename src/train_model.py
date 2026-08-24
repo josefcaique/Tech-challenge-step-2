@@ -7,7 +7,6 @@ import joblib
 import mlflow
 import mlflow.sklearn
 import pandas as pd
-from mlflow.exceptions import MlflowException
 from mlflow.models import infer_signature
 from mlflow.tracking import MlflowClient
 from sklearn.compose import ColumnTransformer
@@ -23,13 +22,13 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
+from src.model_registry import MODEL_NAME, PROMOTION_METRIC, promote_if_better
+
 DATASET_PATH = Path("data/raw/online_shoppers_intention.csv")
 MODEL_PATH = Path("models/random_forest_model.joblib")
 MLFLOW_TRACKING_DIR = Path("mlruns")
-MODEL_NAME = "random_forest_revenue_model"
 MLFLOW_DB_URI = "sqlite:///mlflow.db"
 EXPERIMENT_NAME = "tech-challenge-step-2"
-PROMOTION_METRIC = "f1"
 TEST_SIZE = 0.2
 RANDOM_STATE = 42
 
@@ -144,26 +143,6 @@ def register_model_version(run_id: str):
     return mlflow.register_model(model_uri=model_uri, name=MODEL_NAME)
 
 
-def get_champion_metric(client: MlflowClient, metric_name: str) -> float | None:
-    """Busca a métrica do modelo atualmente marcado como champion, se existir."""
-    try:
-        champion = client.get_model_version_by_alias(MODEL_NAME, "champion")
-    except MlflowException:
-        return None
-    return client.get_run(champion.run_id).data.metrics.get(metric_name)
-
-
-def promote_if_better(client: MlflowClient, version: str, metrics: dict[str, float]) -> bool:
-    """Marca a versão como staging sempre, e como champion só se superar a atual."""
-    client.set_registered_model_alias(MODEL_NAME, "staging", version)
-    current_best = get_champion_metric(client, PROMOTION_METRIC)
-    new_score = metrics[PROMOTION_METRIC]
-    if current_best is None or new_score > current_best:
-        client.set_registered_model_alias(MODEL_NAME, "champion", version)
-        return True
-    return False
-
-
 def save_local_copy(model: Pipeline, path: Path) -> None:
     """Salva uma cópia local do modelo treinado em disco."""
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -189,7 +168,7 @@ def train_and_evaluate(
 def promote_and_report(version: str, metrics: dict[str, float]) -> None:
     """Decide a promoção do modelo no Registry e imprime o resultado."""
     client = MlflowClient()
-    promoted = promote_if_better(client, version, metrics)
+    promoted = promote_if_better(client, MODEL_NAME, version, metrics, PROMOTION_METRIC)
     status = "promoted to champion" if promoted else "kept as staging (did not beat champion)"
     print(f"Model version {version} {status} - {PROMOTION_METRIC}={metrics[PROMOTION_METRIC]:.4f}")
 
