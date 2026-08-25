@@ -1,0 +1,122 @@
+schema: '2.0'
+stages:
+  preprocess:
+    cmd: python -m src.pipeline.preprocess
+    deps:
+    - path: data/raw/online_shoppers_intention.csv
+      hash: md5
+      md5: cc6ec1db03b4f10f8de52c56ff48b085
+      size: 1072063
+    - path: src/pipeline/preprocess.py
+      hash: md5
+      md5: 5d329c0418443edd14834fcca675965c
+      size: 784
+    params:
+      params.yaml:
+        preprocess:
+          raw_data_path: data/raw/online_shoppers_intention.csv
+          processed_data_path:
+            data/processed/online_shoppers_intention_clean.csv
+    outs:
+    - path: data/processed/online_shoppers_intention_clean.csv
+      hash: md5
+      md5: aad39ccafa885f5c4fb248f78c31ee11
+      size: 1159694
+  feature_eng:
+    cmd: python -m src.pipeline.feature_eng
+    deps:
+    - path: data/processed/online_shoppers_intention_clean.csv
+      hash: md5
+      md5: aad39ccafa885f5c4fb248f78c31ee11
+      size: 1159694
+    - path: src/pipeline/feature_eng.py
+      hash: md5
+      md5: 47ee0b5908ae7842e79f897ac6bf8f36
+      size: 1196
+    params:
+      params.yaml:
+        feature_eng:
+          input_path: data/processed/online_shoppers_intention_clean.csv
+          output_path: data/processed/features.parquet
+          target: Revenue
+          categorical_features:
+          - Month
+          - VisitorType
+          drop_features:
+          - Weekend
+    outs:
+    - path: data/processed/features.parquet
+      hash: md5
+      md5: 6f8cf105885d64f25530dcf216dc52be
+      size: 413920
+  train:
+    cmd: python -m src.pipeline.train
+    deps:
+    - path: data/processed/features.parquet
+      hash: md5
+      md5: 6f8cf105885d64f25530dcf216dc52be
+      size: 413920
+    - path: src/pipeline/model.py
+      hash: md5
+      md5: f70d68fa44008435cd75403f3670792b
+      size: 2090
+    - path: src/pipeline/train.py
+      hash: md5
+      md5: 9c0c3cefe32a8b55ab8e3a40d85009bc
+      size: 3152
+    params:
+      params.yaml:
+        train:
+          features_path: data/processed/features.parquet
+          model_path: models/random_forest_model.joblib
+          metrics_path: metrics/train_metrics.json
+          target: Revenue
+          test_size: 0.2
+          random_state: 42
+          n_estimators: 200
+          max_depth: 8
+    outs:
+    - path: metrics/train_metrics.json
+      hash: md5
+      md5: 8dd981e7bddf123821492479dd3fa273
+      size: 84
+    - path: models/random_forest_model.joblib
+      hash: md5
+      md5: 5cab535ecdb2b1bb1f8f6649522c643d
+      size: 4542427
+  evaluate:
+    cmd: python -m src.pipeline.evaluate
+    deps:
+    - path: data/processed/features.parquet
+      hash: md5
+      md5: 6f8cf105885d64f25530dcf216dc52be
+      size: 413920
+    - path: models/random_forest_model.joblib
+      hash: md5
+      md5: 5cab535ecdb2b1bb1f8f6649522c643d
+      size: 4542427
+    - path: src/pipeline/evaluate.py
+      hash: md5
+      md5: a11e8c9f40d5726a58882c7415983d31
+      size: 2451
+    params:
+      params.yaml:
+        evaluate:
+          model_path: models/random_forest_model.joblib
+          features_path: data/processed/features.parquet
+          metrics_path: metrics/evaluation.json
+          target: Revenue
+        train:
+          features_path: data/processed/features.parquet
+          model_path: models/random_forest_model.joblib
+          metrics_path: metrics/train_metrics.json
+          target: Revenue
+          test_size: 0.2
+          random_state: 42
+          n_estimators: 200
+          max_depth: 8
+    outs:
+    - path: metrics/evaluation.json
+      hash: md5
+      md5: 5f375b893dbfc204d1aacd1e7e8f8800
+      size: 176

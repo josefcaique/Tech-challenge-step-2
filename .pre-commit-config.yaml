@@ -12,14 +12,19 @@ repos:
     rev: v4.6.0
     hooks:
       - id: trailing-whitespace
+        exclude: ^\.dvcstore/
       - id: end-of-file-fixer
+        exclude: ^\.dvcstore/
       - id: check-yaml
       - id: check-toml
       - id: check-added-large-files
         args: [--maxkb=5000]
+        exclude: ^\.dvcstore/
       - id: check-merge-conflict
+        exclude: ^\.dvcstore/
       - id: debug-statements
       - id: mixed-line-ending
+        exclude: ^\.dvcstore/
 
   # Garante que dvc.yaml/dvc.lock fiquem sincronizados antes do commit
   - repo: https://github.com/iterative/dvc

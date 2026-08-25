@@ -29,8 +29,9 @@ htmlcov/
 # Poetry
 poetry.lock.bak
 
-# DVC — dados/modelos versionados via DVC, não via Git
+# DVC — dados/modelos versionados via DVC, não via Git (os .dvc/*.dvc ficam no git)
 /data/raw/*
+!/data/raw/*.dvc
 !/data/raw/.gitkeep
 /data/processed/*
 !/data/processed/.gitkeep

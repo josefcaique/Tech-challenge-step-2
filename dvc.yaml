@@ -41,6 +41,7 @@ stages:
       - ${evaluate.features_path}
     params:
       - evaluate
+      - train
     metrics:
       - ${evaluate.metrics_path}:
           cache: false
