@@ -1,0 +1,40 @@
+# Controle de versão
+.git/
+.gitignore
+
+# Ambiente virtual e caches Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Variáveis de ambiente locais
+.env
+.env.local
+
+# Dados e artefatos gerados (versionados via DVC, não precisam entrar na imagem)
+data/raw/*
+data/processed/*
+!data/raw/*.dvc
+!data/processed/.gitkeep
+models/*.joblib
+
+# MLflow local
+mlruns/
+mlartifacts/
+mlflow.db
+
+# Notebooks e checkpoints
+.ipynb_checkpoints/
+notebooks/**/catboost_info/
+
+# Editor/OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

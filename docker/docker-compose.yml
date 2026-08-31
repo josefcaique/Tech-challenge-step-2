@@ -1,4 +1,3 @@
-version: "3.7"
 services:
   postgres:
     image: postgres:15-alpine
@@ -103,6 +102,10 @@ services:
     volumes:
         # Monta as pastas do seu projeto (que estão em ../src/)
         - ../:/home/jarvis/
+        # Volume anônimo sobrepondo .venv: "esconde" o .venv nativo do Windows
+        # do host (binários .pyd) para o Poetry não tentar reaproveitá-lo
+        # dentro do container Linux.
+        - /home/jarvis/.venv
     ports:
         - "8888:8888"
     depends_on:
@@ -111,30 +114,6 @@ services:
   #  networks:
   #      - ml-net
     restart: unless-stopped
-
-  # ==================== FASTAPI (SERVE MODELOS) ====================
-  fastapi:
-    build: ./fastapi-app
-    container_name: mlflow-fastapi
-    environment:
-      MLFLOW_TRACKING_URI: ${MLFLOW_TRACKING_URI}
-      AWS_ACCESS_KEY_ID: ${MINIO_ACCESS_KEY}
-      AWS_SECRET_ACCESS_KEY: ${MINIO_SECRET_ACCESS_KEY}
-      MLFLOW_S3_ENDPOINT_URL: ${MLFLOW_S3_ENDPOINT}
-    ports:
-      - "8000:8000"
-    depends_on:
-      - mlflow
-  #  networks:
-  #      - ml-net
-    restart: unless-stopped
-    volumes:
-      # Monta toda a pasta src (código da aplicação) dentro do container
-      - ../src:/app/src
-    working_dir: /app/src
-    # Supondo que o ponto de entrada seja um arquivo main.py na raiz de src/
-    # Se seu main.py estiver dentro de service/, ajuste para "service.main:app"
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
 volumes:
   postgres_data:
