@@ -15,7 +15,7 @@ stages:
       params.yaml:
         preprocess:
           raw_data_path: data/raw/online_shoppers_intention.csv
-          processed_data_path: 
+          processed_data_path:
             data/processed/online_shoppers_intention_clean.csv
     outs:
     - path: data/processed/online_shoppers_intention_clean.csv
