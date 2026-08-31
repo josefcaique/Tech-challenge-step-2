@@ -9,13 +9,13 @@ stages:
       size: 1072063
     - path: src/pipeline/preprocess.py
       hash: md5
-      md5: 5d329c0418443edd14834fcca675965c
-      size: 784
+      md5: f34500f38eb3622b4a6175b7556d81ba
+      size: 812
     params:
       params.yaml:
         preprocess:
           raw_data_path: data/raw/online_shoppers_intention.csv
-          processed_data_path:
+          processed_data_path: 
             data/processed/online_shoppers_intention_clean.csv
     outs:
     - path: data/processed/online_shoppers_intention_clean.csv
@@ -31,8 +31,8 @@ stages:
       size: 1159694
     - path: src/pipeline/feature_eng.py
       hash: md5
-      md5: 47ee0b5908ae7842e79f897ac6bf8f36
-      size: 1196
+      md5: 4c6b8f6bdf61020b6af5d29f04412feb
+      size: 1236
     params:
       params.yaml:
         feature_eng:
@@ -58,12 +58,12 @@ stages:
       size: 413920
     - path: src/pipeline/model.py
       hash: md5
-      md5: f70d68fa44008435cd75403f3670792b
-      size: 2090
+      md5: bd9e05320a5402fd61d80f80a46287c0
+      size: 2156
     - path: src/pipeline/train.py
       hash: md5
-      md5: 9c0c3cefe32a8b55ab8e3a40d85009bc
-      size: 3152
+      md5: 6defc9e17b042fa8c5471b3d32f7fc31
+      size: 3253
     params:
       params.yaml:
         train:
@@ -82,7 +82,7 @@ stages:
       size: 84
     - path: models/random_forest_model.joblib
       hash: md5
-      md5: 5cab535ecdb2b1bb1f8f6649522c643d
+      md5: db684fb88519d6310059f4b7e84b7b0a
       size: 4542427
   evaluate:
     cmd: python -m src.pipeline.evaluate
@@ -93,12 +93,12 @@ stages:
       size: 413920
     - path: models/random_forest_model.joblib
       hash: md5
-      md5: 5cab535ecdb2b1bb1f8f6649522c643d
+      md5: db684fb88519d6310059f4b7e84b7b0a
       size: 4542427
     - path: src/pipeline/evaluate.py
       hash: md5
-      md5: a11e8c9f40d5726a58882c7415983d31
-      size: 2451
+      md5: 5a4b47f24dc1face26a90d91125f8254
+      size: 2378
     params:
       params.yaml:
         evaluate:

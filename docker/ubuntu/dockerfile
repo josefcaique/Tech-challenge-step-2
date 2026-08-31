@@ -32,8 +32,17 @@ WORKDIR /data
 # ============================================
 # 3. INSTALAÇÃO DO POETRY
 # ============================================
-RUN pip3 install --no-cache-dir poetry==2.4.1 && \
-    poetry config virtualenvs.create false
+# POETRY_VIRTUALENVS_CREATE=false via ENV (não `poetry config`) porque essa
+# config é por usuário — `poetry config` gravada aqui (como root) não é
+# enxergada pelo `datauser` usado em runtime (passo 7). Sem isso, o Poetry
+# tenta criar/reaproveitar um .venv dentro do volume montado do projeto e
+# quebra ao encontrar o .venv nativo do Windows do host.
+# IN_PROJECT=false evita que o Poetry, ao ver uma pasta .venv/ na raiz do
+# projeto montado (mesmo vazia), tente reaproveitá-la como venv "in-project"
+# — esse auto-detect tem precedência sobre CREATE=false se não for desligado.
+ENV POETRY_VIRTUALENVS_CREATE=false
+ENV POETRY_VIRTUALENVS_IN_PROJECT=false
+RUN pip3 install --no-cache-dir poetry==2.4.1
 
 # ============================================
 # 4. CAMADA DE CACHE (DEPENDÊNCIAS)
@@ -45,8 +54,7 @@ COPY poetry.lock /.
 
 
 # Instala as dependências de produção
-RUN poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi --without dev --no-root
+RUN poetry install --no-interaction --no-ansi --without dev --no-root
 
 # ============================================
 # 6. AJUSTE DE PERMISSÕES E VARIÁVEIS DE AMBIENTE
