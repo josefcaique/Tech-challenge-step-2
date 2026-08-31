@@ -5,7 +5,9 @@ compra (Revenue) sobre sessões de e-commerce.
 Rodar localmente:
     poetry run uvicorn src.main:app --reload
 
-Rodar via Docker: ver docker/docker-compose.yml (serviço `fastapi`).
+Extra opcional do projeto — não faz parte do pipeline DVC nem roda em
+container; serve só pra testar inferência local a partir do modelo já
+registrado no MLflow Registry.
 """
 
 import os
@@ -28,15 +30,23 @@ class SessionFeatures(BaseModel):
     """Comportamento de navegação de uma sessão, no mesmo formato do dataset bruto."""
 
     Administrative: int = Field(..., ge=0, description="Nº de páginas administrativas visitadas")
-    Administrative_Duration: float = Field(..., ge=0, description="Tempo total em páginas administrativas (s)")
+    Administrative_Duration: float = Field(
+        ..., ge=0, description="Tempo total em páginas administrativas (s)"
+    )
     Informational: int = Field(..., ge=0, description="Nº de páginas informativas visitadas")
-    Informational_Duration: float = Field(..., ge=0, description="Tempo total em páginas informativas (s)")
+    Informational_Duration: float = Field(
+        ..., ge=0, description="Tempo total em páginas informativas (s)"
+    )
     ProductRelated: int = Field(..., ge=0, description="Nº de páginas de produto visitadas")
-    ProductRelated_Duration: float = Field(..., ge=0, description="Tempo total em páginas de produto (s)")
+    ProductRelated_Duration: float = Field(
+        ..., ge=0, description="Tempo total em páginas de produto (s)"
+    )
     BounceRates: float = Field(..., ge=0, le=1)
     ExitRates: float = Field(..., ge=0, le=1)
     PageValues: float = Field(..., ge=0)
-    SpecialDay: float = Field(..., ge=0, le=1, description="Proximidade a uma data especial (0 a 1)")
+    SpecialDay: float = Field(
+        ..., ge=0, le=1, description="Proximidade a uma data especial (0 a 1)"
+    )
     Month: str = Field(..., examples=["Feb", "Nov", "Dec"])
     OperatingSystems: int
     Browser: int
@@ -50,7 +60,9 @@ class SessionFeatures(BaseModel):
         row = self.model_dump()
         row["TotalPagesViewed"] = self.Administrative + self.Informational + self.ProductRelated
         row["TotalDuration"] = (
-            self.Administrative_Duration + self.Informational_Duration + self.ProductRelated_Duration
+            self.Administrative_Duration
+            + self.Informational_Duration
+            + self.ProductRelated_Duration
         )
         return pd.DataFrame([row])
 
@@ -98,7 +110,9 @@ app = FastAPI(
 @app.get("/health", response_model=HealthResponse)
 def health() -> HealthResponse:
     if _model_state["model"] is None:
-        return HealthResponse(status="model_unavailable", model_name=MODEL_NAME, model_alias=MODEL_ALIAS)
+        return HealthResponse(
+            status="model_unavailable", model_name=MODEL_NAME, model_alias=MODEL_ALIAS
+        )
     return HealthResponse(
         status="ok",
         model_name=MODEL_NAME,
